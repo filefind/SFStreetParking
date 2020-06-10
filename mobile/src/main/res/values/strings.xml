@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">SF ON-Street Parking</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Parking places</string>
+    <string name="title_activity_rates_schedules">Availability, Rates, Schedules</string>
+    <string name="title_home">Availability</string>
+    <string name="title_dashboard">Rates</string>
+    <string name="title_notifications">Schedules</string>
+    <string name="loading">Loading...</string>
+    <string name="sf_on_street_parking">SF ON-Street Parking</string>
+    <string name="wandering_online">WANDERING.ONLINE</string>
+    <string name="communicate">Others</string>
+    <string name="show_map">Parking places</string>
+    <string name="title_activity_gmaps">Map</string>
+    <string name="enter_address">Enter address</string>
+    <string name="url">http://meters.filefind.info/proxy.php</string>
+    <string name="token">oqZkglAUOXiUBBhfyLMhUzoGc</string>
+    <string name="impossible_game">impossible_game</string>
+    <string name="retry_button_text">retry_button_text</string>
+    <string name="default_coin_text">default_coin_text</string>
+    <string name="watch_video_button_text">Video</string>
+</resources>

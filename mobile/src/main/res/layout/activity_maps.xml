@@ -21,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/watch_video_button_text"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:visibility="gone" />
 
     <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         android:id="@+id/map"

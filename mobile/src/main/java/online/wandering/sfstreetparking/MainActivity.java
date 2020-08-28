@@ -163,7 +163,12 @@ public class MainActivity extends AppCompatActivity
 //        autocompleteFragment.setOnPlaceSelectedListener(this);
     }
 
-
+    public void buttonClick(View view){
+        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        intent.putExtra("lat", 37.7731288);
+        intent.putExtra("lon", -122.417171);
+        startActivity(intent);
+    }
 
     @Override
     public void onBackPressed() {

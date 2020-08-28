@@ -98,6 +98,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long timeRemaining;
     boolean isLoading;
 
+    double lat;
+    double lon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,15 +120,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        showVideoButton = findViewById(R.id.show_video_button);
+//        loadRewardedAd();
+
+//        showVideoButton = findViewById(R.id.show_video_button);
 //        showVideoButton.setVisibility(View.GONE);
-        showVideoButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        loadRewardedAd();
-                    }
-                });
+//        showVideoButton.setOnClickListener(
+//                new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        loadRewardedAd();
+//                    }
+//                });
     }
 
     /**
@@ -154,8 +159,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
 
-        double lat;
-        double lon;
         if(getIntent().hasExtra("lat")){
 //            Log.e("ExtraLat", String.valueOf(String.valueOf(getIntent().getExtras().get("lat"))));
             lat = Double.parseDouble(getIntent().getExtras().get("lat").toString());
@@ -201,10 +204,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
 //                    return;
 //                }
-
-//                Intent intent = new Intent(MapsActivity.this, RatesSchedulesActivity.class);
+//                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
 //                intent.putExtra("title", marker.getTitle());
+//                intent.putExtra("lat", lat);
+//                intent.putExtra("lon", lon);
 //                startActivity(intent);
+                Toast.makeText(MapsActivity.this, "Dynamic Street View feature will incur charges",
+                        Toast.LENGTH_LONG).show();
+                Toast.makeText(MapsActivity.this, "Please Make Donation",
+                        Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(MapsActivity.this, DonationsActivity.class);
+                startActivity(intent);
             }
         });
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -514,7 +524,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

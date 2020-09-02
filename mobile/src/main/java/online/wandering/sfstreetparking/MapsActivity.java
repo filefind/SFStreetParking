@@ -204,17 +204,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
 //                    return;
 //                }
-//                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
-//                intent.putExtra("title", marker.getTitle());
-//                intent.putExtra("lat", lat);
-//                intent.putExtra("lon", lon);
-//                startActivity(intent);
-                Toast.makeText(MapsActivity.this, "Dynamic Street View feature will incur charges",
-                        Toast.LENGTH_LONG).show();
-                Toast.makeText(MapsActivity.this, "Please Make Donation",
-                        Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(MapsActivity.this, DonationsActivity.class);
+                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                intent.putExtra("title", marker.getTitle());
+                intent.putExtra("lat", marker.getPosition().latitude);
+                intent.putExtra("lon", marker.getPosition().longitude);
                 startActivity(intent);
+//                Toast.makeText(MapsActivity.this, "Dynamic Street View feature will incur charges",
+//                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(MapsActivity.this, "Please Make Donation",
+//                        Toast.LENGTH_LONG).show();
+//                Intent intent = new Intent(MapsActivity.this, DonationsActivity.class);
+//                startActivity(intent);
             }
         });
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {

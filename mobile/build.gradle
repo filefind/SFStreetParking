@@ -18,8 +18,8 @@ android {
         applicationId "online.wandering.sfstreetparking"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 36
-        versionName "1.0.7.3"
+        versionCode 37
+        versionName "1.0.8"
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

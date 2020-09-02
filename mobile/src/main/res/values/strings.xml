@@ -18,6 +18,7 @@
     <string name="title_activity_gmaps">Map</string>
     <string name="enter_address">Enter address</string>
     <string name="url">http://meters.filefind.info/proxy.php</string>
+    <string name="streetview">http://meters.filefind.info/streetview.php</string>
     <string name="token">oqZkglAUOXiUBBhfyLMhUzoGc</string>
     <string name="impossible_game">impossible_game</string>
     <string name="retry_button_text">retry_button_text</string>

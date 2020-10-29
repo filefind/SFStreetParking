@@ -28,16 +28,9 @@ public class StreetViewActivity extends AppCompatActivity {
         WebView myWebView = (WebView) findViewById(R.id.streetwebview);
         myWebView.setWebViewClient(new WebViewClient());
         WebSettings webSettings = myWebView.getSettings();
-        myWebView.loadUrl(link);
         webSettings.setJavaScriptEnabled(true);
-        myWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-//        SAN_FRAN = new LatLng(getIntent().getExtras().getDouble("lat"),
-//                getIntent().getExtras().getDouble("lon"));
-
-//        SupportStreetViewPanoramaFragment streetViewPanoramaFragment =
-//                (SupportStreetViewPanoramaFragment) getSupportFragmentManager()
-//                        .findFragmentById(R.id.streetviewpanorama);
-//        streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
+//        myWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        myWebView.loadUrl(link);
     }
 
 //    @Override

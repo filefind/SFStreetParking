@@ -1,6 +1,7 @@
 package online.wandering.sfstreetparking;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,19 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -59,7 +73,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient
@@ -119,6 +135,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onInitializationComplete(InitializationStatus initializationStatus) {
             }
         });
+
 
 //        loadRewardedAd();
 
@@ -353,7 +370,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-//            Log.e("------", String.valueOf(result));
+            Log.e("------", String.valueOf(result));
                 JSONArray jsonArray = null;
                 try {
                     jsonArray = new JSONArray(result);

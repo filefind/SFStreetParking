@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SFStreetParking.iml" filepath="$PROJECT_DIR$/SFStreetParking.iml" group="SFStreetParking" />
-      <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" group="SFStreetParking/mobile" />
+      <module fileurl="file://$PROJECT_DIR$/SFStreetParking.iml" filepath="$PROJECT_DIR$/SFStreetParking.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mobile/SFStreetParking.mobile.iml" filepath="$PROJECT_DIR$/.idea/modules/mobile/SFStreetParking.mobile.iml" />
     </modules>
   </component>
 </project>

@@ -10,7 +10,7 @@
     <string name="title_home">Availability</string>
     <string name="title_dashboard">Rates</string>
     <string name="title_notifications">Schedules</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="sf_on_street_parking">SF ON-Street Parking</string>
     <string name="wandering_online">WANDERING.ONLINE</string>
     <string name="communicate">Others</string>

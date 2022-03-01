@@ -1,7 +1,6 @@
 package online.wandering.sfstreetparking;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,28 +29,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ConsumeResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdCallback;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,12 +54,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
+        GoogleApiClient
         .ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener,
         GoogleMap.OnMapClickListener {
 
@@ -94,7 +74,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FusedLocationProviderClient mFusedLocationClient;
     private String rate = null;
     private TextView details;
-    RewardedVideoAd mRewardedVideoAd = null;
+//    RewardedVideoAd mRewardedVideoAd = null;
 
     /* AdMob */
 
@@ -129,25 +109,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         FragmentManager myFragmentManager = getSupportFragmentManager();
         SupportMapFragment mapFragment = (SupportMapFragment) myFragmentManager.findFragmentById(R.id.map);
 
+//        reqardCallback = rewardedAd.getFullScreenContentCallback();
+
         mapFragment.getMapAsync(this);
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(InitializationStatus initializationStatus) {
+                //loadRewardedAd();
             }
         });
 
-
-//        loadRewardedAd();
-
-//        showVideoButton = findViewById(R.id.show_video_button);
-//        showVideoButton.setVisibility(View.GONE);
-//        showVideoButton.setOnClickListener(
-//                new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        loadRewardedAd();
-//                    }
-//                });
+        showVideoButton = findViewById(R.id.show_video_button);
+        showVideoButton.setVisibility(View.GONE);
+        showVideoButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        loadRewardedAd();
+                    }
+                });
     }
 
     /**
@@ -173,6 +153,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
             return;
         }
 
@@ -225,13 +208,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 intent.putExtra("title", marker.getTitle());
                 intent.putExtra("lat", marker.getPosition().latitude);
                 intent.putExtra("lon", marker.getPosition().longitude);
-                startActivity(intent);
+//                startActivity(intent);
 //                Toast.makeText(MapsActivity.this, "Dynamic Street View feature will incur charges",
 //                        Toast.LENGTH_LONG).show();
 //                Toast.makeText(MapsActivity.this, "Please Make Donation",
 //                        Toast.LENGTH_LONG).show();
 //                Intent intent = new Intent(MapsActivity.this, DonationsActivity.class);
-//                startActivity(intent);
+                startActivity(intent);
             }
         });
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -264,7 +247,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         mMap.setMyLocationEnabled(true);
-        checkParking(lat, lon);
+        Runnable parkingTread = new Runnable(){
+            public void run() {
+                checkParking(lat, lon);
+            }
+        };
+
+        new Thread(parkingTread).start();
+        Runnable camTread = new Runnable(){
+            public void run() {
+                checkCams(lat, lon);
+            }
+        };
+
+        new Thread(camTread).start();
+
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -366,113 +363,217 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             userdata += e.getKey() + "=" + e.getValue() + "&";
         }
 //        Log.e("--------",userdata);
-        new DownloadTask(){
+         new DownloadTask() {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-            Log.e("------", String.valueOf(result));
-                JSONArray jsonArray = null;
+//                Log.e("+------", result);
+                JSONObject jsonObject = null;
                 try {
-                    jsonArray = new JSONArray(result);
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    Double rateValue = 1000.0;
-                    Marker rateMarker = null;
-                    String dataValue = "";
-                    mHashMap.clear();
-                    if(jsonArray.length()>0){
-                        Double minRate = 1000.0;
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            Boolean showMin = false;
-                            String snippetValue="";
-                            JSONObject jsonObjectUnit = new JSONObject(jsonArray.get(j).toString());
-                            String post_id = jsonObjectUnit.getString
-                                    ("post_id");
-                            String sensor_flag = jsonObjectUnit.getString
-                                    ("sensor_flag");
-                            Double latitude = Double.valueOf(jsonObjectUnit.getString
-                                    ("latitude"));
-                            Double longitude = Double.valueOf(jsonObjectUnit.getString
-                                    ("longitude"));
-                            MarkerOptions mPriceMarkerOptions = new MarkerOptions();
-                            LatLng latLngPrice = new LatLng(latitude,longitude);
-                            mPriceMarkerOptions.position(latLngPrice);
-                            mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.sad));
-                            if(sensor_flag.equals("N")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.thumbsup));
-                            if(sensor_flag.equals("E")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.info));
-                            if(sensor_flag.equals("Y")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.danger));
-                            if(sensor_flag.equals("X")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.target));
-                            if(sensor_flag.equals("P")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.pinion));
-                            if(sensor_flag.equals("R")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.piechart));
-                            if(sensor_flag.equals("C")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.help));
-                            if(sensor_flag.equals("I")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.redstar));
-                            if(sensor_flag.equals("H")) mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.warning));
-                            Marker marker = mMap.addMarker(mPriceMarkerOptions);
-                            marker.hideInfoWindow();
-                            builder.include(latLngPrice);
-                            mHashMap.put(marker.getId(),marker);
-                            marker.setTitle("Unit #"+post_id);
+                    jsonObject = new JSONObject(result);
+                    try {
+                        if (jsonObject.has("meters")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("meters");
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            Double rateValue = 1000.0;
+                            Marker rateMarker = null;
+                            String dataValue = "";
+                            mHashMap.clear();
+                            if (jsonArray.length() > 0) {
+                                Double minRate = 1000.0;
+                                for (int j = 0; j < jsonArray.length(); j++) {
+                                    Boolean showMin = false;
+                                    String snippetValue = "";
+                                    JSONObject jsonObjectUnit = new JSONObject(jsonArray.get(j).toString());
+                                    String post_id = jsonObjectUnit.getString
+                                            ("post_id");
+                                    String sensor_flag = jsonObjectUnit.getString
+                                            ("sensor_flag");
+                                    Double latitude = Double.valueOf(jsonObjectUnit.getString
+                                            ("latitude"));
+                                    Double longitude = Double.valueOf(jsonObjectUnit.getString
+                                            ("longitude"));
+                                    MarkerOptions mPriceMarkerOptions = new MarkerOptions();
+                                    LatLng latLngPrice = new LatLng(latitude, longitude);
+                                    mPriceMarkerOptions.position(latLngPrice);
+                                    mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.sad));
+                                    if (sensor_flag.equals("N"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.thumbsup));
+                                    if (sensor_flag.equals("E"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.info));
+                                    if (sensor_flag.equals("Y"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.danger));
+                                    if (sensor_flag.equals("X"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.target));
+                                    if (sensor_flag.equals("P"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.pinion));
+                                    if (sensor_flag.equals("R"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.piechart));
+                                    if (sensor_flag.equals("C"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.help));
+                                    if (sensor_flag.equals("I"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.redstar));
+                                    if (sensor_flag.equals("H"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.warning));
+                                    Marker marker = mMap.addMarker(mPriceMarkerOptions);
+                                    marker.hideInfoWindow();
+                                    builder.include(latLngPrice);
+                                    mHashMap.put(marker.getId(), marker);
+                                    marker.setTitle("Unit #" + post_id);
 
-                            snippetValue+="Time: "+jsonObjectUnit.getString("now")+"\n";
-                            String rates = "";
-                            String schedule = "";
-                            if(jsonObjectUnit.has("schedule")){
-                                JSONArray jsonArraySchedule = null;
-                                jsonArraySchedule = new JSONArray(jsonObjectUnit.getString("schedule"));
-                                for (int i = 0; i < jsonArraySchedule.length(); i++) {
-                                    JSONObject jsonObjectUnitSchedule =
-                                            new JSONObject(jsonArraySchedule.get(i).toString());
+                                    snippetValue += "Time: " + jsonObjectUnit.getString("now") + "\n";
+                                    String rates = "";
+                                    String schedule = "";
+                                    if (jsonObjectUnit.has("schedule")) {
+                                        JSONArray jsonArraySchedule = null;
+                                        jsonArraySchedule = new JSONArray(jsonObjectUnit.getString("schedule"));
+                                        for (int i = 0; i < jsonArraySchedule.length(); i++) {
+                                            JSONObject jsonObjectUnitSchedule =
+                                                    new JSONObject(jsonArraySchedule.get(i).toString());
 //                                    schedule+="\nPriority: "+jsonObjectUnitSchedule.getString(
 //                                            "schedule_priority");
-                                    schedule+="\n"+jsonObjectUnitSchedule.getString("schedule_type")+": " +
-                                            ""+jsonObjectUnitSchedule.getString("time_limit");
-                                    if(jsonObjectUnitSchedule.has("days_applied")){
-                                        schedule+="\n"+jsonObjectUnitSchedule.getString("days_applied")+
-                                                " ("+jsonObjectUnitSchedule.getString("from_time")+" - "+jsonObjectUnitSchedule.getString("to_time")+")";
+                                            schedule += "\n" + jsonObjectUnitSchedule.getString("schedule_type") + ": " +
+                                                    "" + jsonObjectUnitSchedule.getString("time_limit");
+                                            if (jsonObjectUnitSchedule.has("days_applied")) {
+                                                schedule += "\n" + jsonObjectUnitSchedule.getString("days_applied") +
+                                                        " (" + jsonObjectUnitSchedule.getString("from_time") + " - " + jsonObjectUnitSchedule.getString("to_time") + ")";
+                                            }
+                                        }
+                                    } else {
+                                        schedule += "\nSchedules not available!";
                                     }
-                                }
-                            } else {
-                                schedule+="\nSchedules not available!";
-                            }
-                            if(jsonObjectUnit.has("rates")){
-                                JSONArray jsonArrayRates = null;
-                                jsonArrayRates = new JSONArray(jsonObjectUnit.getString("rates"));
-                                for (int i = 0; i < jsonArrayRates.length(); i++) {
-                                    JSONObject jsonObjectUnitRates =
-                                            new JSONObject(jsonArrayRates.get(i).toString());
-                                    if(i==0) rates+=""; else rates+="\n";
+                                    if (jsonObjectUnit.has("rates")) {
+                                        JSONArray jsonArrayRates = null;
+                                        jsonArrayRates = new JSONArray(jsonObjectUnit.getString("rates"));
+                                        for (int i = 0; i < jsonArrayRates.length(); i++) {
+                                            JSONObject jsonObjectUnitRates =
+                                                    new JSONObject(jsonArrayRates.get(i).toString());
+                                            if (i == 0) rates += "";
+                                            else rates += "\n";
 //                                    rates+="Priority: "+jsonObjectUnitRates.getString(
 //                                            "schedule_priority");
-                                    rates+=""+jsonObjectUnitRates.getString("rate_type")+": " +
-                                            "$"+jsonObjectUnitRates.getString("rate");
-                                    if(jsonObjectUnitRates.has("days_applied")){
-                                        rates+="\n"+jsonObjectUnitRates.getString("days_applied")+
-                                                " ("+jsonObjectUnitRates.getString("from_time")+" - "+jsonObjectUnitRates.getString("to_time")+")";
+                                            rates += "" + jsonObjectUnitRates.getString("rate_type") + ": " +
+                                                    "$" + jsonObjectUnitRates.getString("rate");
+                                            if (jsonObjectUnitRates.has("days_applied")) {
+                                                rates += "\n" + jsonObjectUnitRates.getString("days_applied") +
+                                                        " (" + jsonObjectUnitRates.getString("from_time") + " - " + jsonObjectUnitRates.getString("to_time") + ")";
+                                            }
+                                            if (jsonObjectUnitRates.getDouble("rate") < minRate) {
+                                                minRate = jsonObjectUnitRates.getDouble("rate");
+                                                showMin = true;
+                                                marker.showInfoWindow();
+                                            }
+                                        }
+                                    } else {
+                                        rates += "Rates not available!";
                                     }
-                                    if(jsonObjectUnitRates.getDouble("rate")<minRate){
-                                        minRate=jsonObjectUnitRates.getDouble("rate");
-                                        showMin = true;
+                                    marker.setSnippet(snippetValue + rates + schedule);
+                                    if (showMin.equals(true)) {
                                         marker.showInfoWindow();
                                     }
                                 }
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),
+                                        100));
+                                details.setText("$" + minRate);
                             } else {
-                                rates+="Rates not available!";
-                            }
-                            marker.setSnippet(snippetValue+rates+schedule);
-                            if(showMin.equals(true)){
-                                marker.showInfoWindow();
+                                details.setText("There is no meters!");
                             }
                         }
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),
-                                100));
-                        details.setText("$"+minRate);
-                    } else {
-                        details.setText("There is no meters!");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }.execute(getString(R.string.url)+"?action=loadMarkers", userdata);
+        }.execute("https://meters.filefind.info/proxy.php?action=loadMarkers",userdata);
+    }
+
+    private void checkCams (double lat, double lng){
+        Map<String, String> assoc = new HashMap<String, String>();
+        assoc.put("lat", String.valueOf(lat));
+        assoc.put("lng", String.valueOf(lng));
+        assoc.put("zoom", "12");
+
+        String userdata = "";
+        for (Map.Entry<String, String> e : assoc.entrySet()) {
+            userdata += e.getKey() + "=" + e.getValue() + "&";
+        }
+        Log.e("--------",userdata);
+         new DownloadTask() {
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+//                Log.e("+++------", "["+result+"]");
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(result);
+                    try {
+                        if (jsonObject.has("cams")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("cams");
+//                            Log.e("+------", String.valueOf(jsonArray));
+                            if (jsonArray.length() > 0) {
+                                Boolean showMin = false;
+                                String snippetValue = "";
+                                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                for (int j = 0; j < jsonArray.length(); j++) {
+                                    JSONObject jsonObjectUnit = (JSONObject) jsonArray.get(j);
+                                    Log.e("******", String.valueOf(jsonObjectUnit.getInt("id")));
+                                    if (!jsonObjectUnit.has("id")){
+                                        continue;
+                                    }
+                                    String post_id = jsonObjectUnit.getString
+                                            ("id");
+                                    String status = jsonObjectUnit.getString
+                                            ("status");
+                                    String title = jsonObjectUnit.getString
+                                            ("title");
+                                    Double latitude =
+                                            Double.valueOf(jsonObjectUnit.getJSONObject("location").getString
+                                            ("latitude"));
+                                    Double longitude = Double.valueOf(jsonObjectUnit.getJSONObject("location").getString
+                                            ("longitude"));
+                                    String lifetime = jsonObjectUnit.getJSONObject(
+                                            "player").getJSONObject(
+                                            "lifetime").getString
+                                            ("embeded");
+                                    String user = jsonObjectUnit.getJSONObject(
+                                            "user").getString
+                                            ("name");
+                                    MarkerOptions mPriceMarkerOptions = new MarkerOptions();
+                                    LatLng latLngPrice = new LatLng(latitude, longitude);
+                                    mPriceMarkerOptions.position(latLngPrice);
+                                    mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.redstar));
+                                    if (status.equals("Active"))
+                                        mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.redstar));
+                                    Marker marker = mMap.addMarker(mPriceMarkerOptions);
+                                    marker.hideInfoWindow();
+                                    builder.include(latLngPrice);
+                                    mHashMap.put(marker.getId(), marker);
+                                    marker.setTitle("Camera #" + post_id);
+
+                                    snippetValue += "Status: " + status +
+                                            "\n";
+                                    snippetValue += title +
+                                            "\n";
+                                    snippetValue += "<a href=\""+lifetime+"\">life</>" +
+                                            "\n";
+
+                                    marker.setSnippet(snippetValue);
+                                    if (showMin.equals(true)) {
+                                        marker.showInfoWindow();
+                                    }
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute("https://meters.filefind.info/proxy.php?action=loadCams",userdata);
     }
 
     public void loadAvailability (String post_id){
@@ -552,68 +653,69 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /* Admob */
 
     private void loadRewardedAd() {
-        if (rewardedAd == null || !rewardedAd.isLoaded()) {
-            rewardedAd = new RewardedAd(this, AD_UNIT_ID);
-            isLoading = true;
-            Log.e("TAG","loadRewardedAd");
-            rewardedAd.loadAd(
-                    new AdRequest.Builder().build(),
-                    new RewardedAdLoadCallback() {
-                        @Override
-                        public void onRewardedAdLoaded() {
-                            // Ad successfully loaded.
-                            MapsActivity.this.isLoading = false;
-                            Toast.makeText(MapsActivity.this, "Success!",
-                                    Toast.LENGTH_SHORT).show();
-                            showRewardedVideo();
-                        }
-
-                        @Override
-                        public void onRewardedAdFailedToLoad(int errorCode) {
-                            // Ad failed to load.
-                            MapsActivity.this.isLoading = false;
-                            Toast.makeText(MapsActivity.this, "No ads available!",
-                                    Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    });
-        }
+        if (rewardedAd != null) {
+            rewardedAd.getAdUnitId();
+        } else return;
+        rewardedAd.getOnPaidEventListener();
+        rewardedAd.setFullScreenContentCallback(rewardedAd.getFullScreenContentCallback());
+                Log.e("TAG","loadRewardedAd");
+//        rewardedAd.loadAd(
+//                new AdRequest.Builder().build(),
+//                new RewardedAdLoadCallback() {
+//                    @Override
+//                    public void onRewardedAdLoaded() {
+//                        // Ad successfully loaded.
+//                        MapsActivity.this.isLoading = false;
+//                        Toast.makeText(MapsActivity.this, "Success!",
+//                                Toast.LENGTH_SHORT).show();
+//                        showRewardedVideo();
+//                    }
+//
+//                    @Override
+//                    public void onRewardedAdFailedToLoad(int errorCode) {
+//                        // Ad failed to load.
+//                        MapsActivity.this.isLoading = false;
+//                        Toast.makeText(MapsActivity.this, "No ads available!",
+//                                Toast.LENGTH_SHORT)
+//                                .show();
+//                    }
+//                });
     }
 
-    private void showRewardedVideo() {
-//        showVideoButton.setVisibility(View.INVISIBLE);
-        if (rewardedAd.isLoaded()) {
-            RewardedAdCallback adCallback =
-                    new RewardedAdCallback() {
-                        @Override
-                        public void onRewardedAdOpened() {
-                            // Ad opened.
-//                            Toast.makeText(MapsActivity.this, "onRewardedAdOpened", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onRewardedAdClosed() {
-                            // Ad closed.
-//                            Toast.makeText(MapsActivity.this, "onRewardedAdClosed", Toast.LENGTH_SHORT).show();
-                            // Preload the next video ad.
-//                            MapsActivity.this.loadRewardedAd();
-                        }
-
-                        @Override
-                        public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
-//                            Toast.makeText(MapsActivity.this, "onUserEarnedReward", Toast.LENGTH_SHORT).show();
-//                            addCoins(rewardItem.getAmount());
-                        }
-
-                        @Override
-                        public void onRewardedAdFailedToShow(int errorCode) {
-                            // Ad failed to display
-                            Toast.makeText(MapsActivity.this, "onRewardedAdFailedToShow",
-                                    Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    };
-            rewardedAd.show(this, adCallback);
-        }
-    }
+//    private void showRewardedVideo() {
+////        showVideoButton.setVisibility(View.INVISIBLE);
+//        if (rewardedAd.isLoaded()) {
+//            RewardedAdCallback adCallback =
+//                    new RewardedAdCallback() {
+//                        @Override
+//                        public void onRewardedAdOpened() {
+//                            // Ad opened.
+////                            Toast.makeText(MapsActivity.this, "onRewardedAdOpened", Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                        @Override
+//                        public void onRewardedAdClosed() {
+//                            // Ad closed.
+////                            Toast.makeText(MapsActivity.this, "onRewardedAdClosed", Toast.LENGTH_SHORT).show();
+//                            // Preload the next video ad.
+////                            MapsActivity.this.loadRewardedAd();
+//                        }
+//
+//                        @Override
+//                        public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+////                            Toast.makeText(MapsActivity.this, "onUserEarnedReward", Toast.LENGTH_SHORT).show();
+////                            addCoins(rewardItem.getAmount());
+//                        }
+//
+//                        @Override
+//                        public void onRewardedAdFailedToShow(int errorCode) {
+//                            // Ad failed to display
+//                            Toast.makeText(MapsActivity.this, "onRewardedAdFailedToShow",
+//                                    Toast.LENGTH_SHORT)
+//                                    .show();
+//                        }
+//                    };
+//            rewardedAd.show(this, adCallback);
+//        }
+//    }
 }

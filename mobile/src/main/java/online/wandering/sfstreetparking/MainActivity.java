@@ -18,22 +18,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ConsumeResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -44,17 +30,16 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PlaceSelectionListener {
 
 //    PlaceAutocompleteFragment autocompleteFragment;
-    private PurchasesUpdatedListener purchaseUpdateListener;
-    private BillingClient billingClient;
+//    private PurchasesUpdatedListener purchaseUpdateListener;
+//    private BillingClient billingClient;
+//    private BillingClientStateListener billingListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,12 +149,12 @@ public class MainActivity extends AppCompatActivity
 //        }
 
 // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+//        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+//                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+//        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
 
-        autocompleteFragment.setOnPlaceSelectedListener(this);
+//        autocompleteFragment.setOnPlaceSelectedListener(this);
         // Retrieve the PlaceAutocompleteFragment.
 //        autocompleteFragment = (PlaceAutocompleteFragment)
 //                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -177,101 +162,104 @@ public class MainActivity extends AppCompatActivity
         // Register a listener to receive callbacks when a place has been selected or an error has
         // occurred.
 //        autocompleteFragment.setOnPlaceSelectedListener(this);
-        purchaseUpdateListener = new PurchasesUpdatedListener() {
-            @Override
-            public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
-                // To be implemented in a later section.
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                        && purchases != null) {
-                    for (Purchase purchase : purchases) {
-                        handlePurchase(purchase);
-                    }
-                } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-                    // Handle an error caused by a user cancelling the purchase flow.
-                } else {
-                    // Handle any other error codes.
-                }
-            }
-            void handlePurchase(Purchase purchase) {
-                // Purchase retrieved from BillingClient#queryPurchases or your PurchasesUpdatedListener.
-//            Purchase purchase = purchase;
-                // Verify the purchase.
-                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                    if (!purchase.isAcknowledged()) {
-                        AcknowledgePurchaseParams acknowledgePurchaseParams =
-                                AcknowledgePurchaseParams.newBuilder()
-                                        .setPurchaseToken(purchase.getPurchaseToken())
-                                        .build();
-                        AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
-                            @Override
-                            public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+//        purchaseUpdateListener = new PurchasesUpdatedListener() {
+//            @Override
+//            public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
+//                // To be implemented in a later section.
+//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
+//                        && purchases != null) {
+//                    for (Purchase purchase : purchases) {
+//                        handlePurchase(purchase);
+//                    }
+//                } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+//                    // Handle an error caused by a user cancelling the purchase flow.
+//                } else {
+//                    // Handle any other error codes.
+//                }
+//            }
+//            void handlePurchase(Purchase purchase) {
+//                // Purchase retrieved from BillingClient#queryPurchases or your PurchasesUpdatedListener.
+////            Purchase purchase = purchase;
+//                // Verify the purchase.
+//                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+//                    if (!purchase.isAcknowledged()) {
+//                        AcknowledgePurchaseParams acknowledgePurchaseParams =
+//                                AcknowledgePurchaseParams.newBuilder()
+//                                        .setPurchaseToken(purchase.getPurchaseToken())
+//                                        .build();
+//                        AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
+//                            @Override
+//                            public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+//
+////                            getMes("Purchase acknowledged");
+//                            }
+//
+//                        };
+//                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
+//                    }
+//                }            // Ensure entitlement was not already granted for this purchaseToken.
+//                // Grant entitlement to the user.
+//
+//                ConsumeParams consumeParams =
+//                        ConsumeParams.newBuilder()
+//                                .setPurchaseToken(purchase.getPurchaseToken())
+//                                .build();
+//
+//                ConsumeResponseListener listener = new ConsumeResponseListener() {
+//                    @Override
+//                    public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
+//                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+//                            // Handle the success of the consume operation.
+//                        }
+//                    }
+//                };
+//
+//                billingClient.consumeAsync(consumeParams, listener);
+//            }
+//        };
+//        billingClient = BillingClient.newBuilder(this)
+//                .setListener(purchaseUpdateListener)
+//                .enablePendingPurchases()
+//                .build();
+//
+//        billingListener = new BillingClientStateListener() {
+//            @Override
+//            public void onBillingSetupFinished(BillingResult billingResult) {
+//                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
+//                    // The BillingClient is ready. You can query purchases here.
+//                    List<String> skuList = new ArrayList<>();
+//                    skuList.add("premium_upgrade");
+//                    skuList.add("gas");
+//                    SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+//                    params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+////                    billingClient.querySkuDetailsAsync(params.build(),
+////                            new SkuDetailsResponseListener() {
+////                                @Override
+////                                public void onSkuDetailsResponse(BillingResult billingResult,
+////                                                                 List<SkuDetails> skuDetailsList) {
+////                                    // Process the result.
+////                                    Log.e("--------", String.valueOf(skuDetailsList));
+//////                                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+//////                                            .setSkuDetails(skuDetailsList.get(0))
+//////                                            .build();
+//////                                    int responseCode =
+//////                                            billingClient.launchBillingFlow(MainActivity.this,
+//////                                                    billingFlowParams).getResponseCode();
+////                                }
+////                            });
+//                }
+//            }
+//            @Override
+//            public void onBillingServiceDisconnected() {
+////                billingClient.startConnection(billingListener);
+//                // Try to restart the connection on the next request to
+//                // Google Play by calling the startConnection() method.
+//            }
+//        };
+//
+//        billingClient.startConnection(billingListener);
 
-//                            getMes("Purchase acknowledged");
-                            }
-
-                        };
-                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
-                    }
-                }            // Ensure entitlement was not already granted for this purchaseToken.
-                // Grant entitlement to the user.
-
-                ConsumeParams consumeParams =
-                        ConsumeParams.newBuilder()
-                                .setPurchaseToken(purchase.getPurchaseToken())
-                                .build();
-
-                ConsumeResponseListener listener = new ConsumeResponseListener() {
-                    @Override
-                    public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                            // Handle the success of the consume operation.
-                        }
-                    }
-                };
-
-                billingClient.consumeAsync(consumeParams, listener);
-            }
-        };
-
-        billingClient = BillingClient.newBuilder(this)
-                .setListener(purchaseUpdateListener)
-                .enablePendingPurchases()
-                .build();
-
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() ==  BillingClient.BillingResponseCode.OK) {
-                    // The BillingClient is ready. You can query purchases here.
-                    List<String> skuList = new ArrayList<>();
-                    skuList.add("premium_upgrade");
-                    skuList.add("gas");
-                    SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-                    params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
-                    billingClient.querySkuDetailsAsync(params.build(),
-                            new SkuDetailsResponseListener() {
-                                @Override
-                                public void onSkuDetailsResponse(BillingResult billingResult,
-                                                                 List<SkuDetails> skuDetailsList) {
-                                    // Process the result.
-                                    Log.e("--------", String.valueOf(skuDetailsList));
-                                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                                            .setSkuDetails(skuDetailsList.get(0))
-                                            .build();
-                                    int responseCode =
-                                            billingClient.launchBillingFlow(MainActivity.this,
-                                            billingFlowParams).getResponseCode();
-                                }
-                            });
-                }
-            }
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-            }
-        });
-
+        Log.e("+++++","-----------------------------");
     }
 
     public void buttonClick(View view){
@@ -330,7 +318,6 @@ public class MainActivity extends AppCompatActivity
        return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.

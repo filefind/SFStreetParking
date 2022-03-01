@@ -29,7 +29,8 @@ public class StreetViewActivity extends AppCompatActivity {
         myWebView.setWebViewClient(new WebViewClient());
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-//        myWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        myWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+//        myWebView.clearCache(true);
         myWebView.loadUrl(link);
     }
 

@@ -32,6 +32,7 @@ public class LoadWebActivity extends AppCompatActivity {
         return wv;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -676,6 +676,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .show();
         details.setText("Loading. Please wait...");
         checkParking (latLng.latitude, latLng.longitude);
+        checkCams (latLng.latitude, latLng.longitude);
     }
 
     @Override

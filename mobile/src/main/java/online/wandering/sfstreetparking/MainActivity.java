@@ -7,9 +7,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -21,15 +18,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,14 +40,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Snackbar.make(view, "Underconstruction", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+////                Snackbar.make(view, "Underconstruction", Snackbar.LENGTH_LONG)
+////                        .setAction("Action", null).show();
+//            }
+//        });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -66,83 +57,83 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        TextView content = findViewById(R.id.content);
+//        TextView content = findViewById(R.id.content);
 //        content.setText("Good Luck!");
 
-        Map<String, String> assoc = new HashMap<String, String>();
-        assoc.put("offset", String.valueOf(0));
-        assoc.put("limit", String.valueOf(10));
-        String userdata = "";
-        for (Map.Entry<String, String> e : assoc.entrySet()) {
-            userdata += "&" + e.getKey() + "=" + URLEncoder.encode(e.getValue());
-        }
+//        Map<String, String> assoc = new HashMap<String, String>();
+//        assoc.put("offset", String.valueOf(0));
+//        assoc.put("limit", String.valueOf(10));
+//        String userdata = "";
+//        for (Map.Entry<String, String> e : assoc.entrySet()) {
+//            userdata += "&" + e.getKey() + "=" + URLEncoder.encode(e.getValue());
+//        }
 //        Log.e("+++", String.valueOf(userdata));
-        new DownloadTask(){
-
-            private ArrayList getListData(JSONArray items) {
-                ArrayList<SharelistItem> results = new ArrayList<SharelistItem>();
-//                    Log.e(TAG, String.valueOf(items));
-                try {
-                    for (int i = 0; i < items.length(); i++) {
-                        JSONArray item = items.getJSONArray(i);
-                        SharelistItem newsData = new SharelistItem();
-                        newsData.setHeadline(item.getString(0));
-                        newsData.setStatus(item.getString(1));
-                        newsData.setLat(item.getString(2));
-                        newsData.setLng(item.getString(3));
-                        results.add(newsData);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                // Add some more dummy data for testing
-                return results;
-            }
-
-
-            // Executes in UI thread, after the execution of doInBackground();
-            @Override
-            protected void onPostExecute(String result) {
-                super.onPostExecute(result);
-            Toast.makeText(getApplicationContext(), "Server connected!", Toast.LENGTH_SHORT)
-                    .show();
-//                Log.e("+++", String.valueOf(result));
-
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(result);
-                    if(jsonObject.has("action") && jsonObject.getString("action").equals("loadLast")) {
-                        JSONArray list = jsonObject.getJSONArray("data");
-                        ArrayList image_details = getListData(list);
-                        final ListView lv1 = findViewById(R.id.shareListView);
-//                        lv1.setVisibility(View.VISIBLE);
-                        lv1.setAdapter(new CustomListAdapter(MainActivity.this,
-                                image_details));
-                        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-                            @Override
-                            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                                Object o = lv1.getItemAtPosition(position);
-                                SharelistItem shareListData = (SharelistItem) o;
-//                            autocompleteFragment.setText(shareListData.getHeadline());
-//                                LinearLayout saveLayout = findViewById(R.id.saveLayout);
-                                Intent intent = new Intent(MainActivity.this, MapsActivity
-                                        .class);
-//                                intent.putExtra("token", token);
-                                intent.putExtra("name", shareListData.getHeadline());
-                                intent.putExtra("lat", shareListData.getLat());
-                                intent.putExtra("lon", shareListData.getLng());
-//                                intent.putExtra("mapLL", shareListData.getStatus());
-                                startActivity(intent);
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }.execute(getString(R.string.url)+"?action=loadLast", userdata);
+//        new DownloadTask(){
+//
+//            private ArrayList getListData(JSONArray items) {
+//                ArrayList<SharelistItem> results = new ArrayList<SharelistItem>();
+////                    Log.e(TAG, String.valueOf(items));
+//                try {
+//                    for (int i = 0; i < items.length(); i++) {
+//                        JSONArray item = items.getJSONArray(i);
+//                        SharelistItem newsData = new SharelistItem();
+//                        newsData.setHeadline(item.getString(0));
+//                        newsData.setStatus(item.getString(1));
+//                        newsData.setLat(item.getString(2));
+//                        newsData.setLng(item.getString(3));
+//                        results.add(newsData);
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                // Add some more dummy data for testing
+//                return results;
+//            }
+//
+//
+//            // Executes in UI thread, after the execution of doInBackground();
+//            @Override
+//            protected void onPostExecute(String result) {
+//                super.onPostExecute(result);
+//            Toast.makeText(getApplicationContext(), "Server connected!", Toast.LENGTH_SHORT)
+//                    .show();
+////                Log.e("+++", String.valueOf(result));
+//
+//                JSONObject jsonObject = null;
+//                try {
+//                    jsonObject = new JSONObject(result);
+//                    if(jsonObject.has("action") && jsonObject.getString("action").equals("loadLast")) {
+//                        JSONArray list = jsonObject.getJSONArray("data");
+//                        ArrayList image_details = getListData(list);
+//                        final ListView lv1 = findViewById(R.id.shareListView);
+////                        lv1.setVisibility(View.VISIBLE);
+//                        lv1.setAdapter(new CustomListAdapter(MainActivity.this,
+//                                image_details));
+//                        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//
+//                            @Override
+//                            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+//                                Object o = lv1.getItemAtPosition(position);
+//                                SharelistItem shareListData = (SharelistItem) o;
+////                            autocompleteFragment.setText(shareListData.getHeadline());
+////                                LinearLayout saveLayout = findViewById(R.id.saveLayout);
+//                                Intent intent = new Intent(MainActivity.this, MapsActivity
+//                                        .class);
+////                                intent.putExtra("token", token);
+//                                intent.putExtra("name", shareListData.getHeadline());
+//                                intent.putExtra("lat", shareListData.getLat());
+//                                intent.putExtra("lon", shareListData.getLng());
+////                                intent.putExtra("mapLL", shareListData.getStatus());
+//                                startActivity(intent);
+//                            }
+//                        });
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//        }.execute(getString(R.string.url)+"?action=loadLast", userdata);
 
 //        if (!Places.isInitialized()) {
 //            Places.initialize(getApplicationContext(),"");

@@ -217,7 +217,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Intent intent = new Intent();
                 if(Pattern.matches("^Camera.*", marker.getTitle())){
                     intent = new Intent(MapsActivity.this, LoadWebActivity.class);
-                    intent.putExtra("link", lifetime);
+                    intent.putExtra("link", String.valueOf(marker.getTag()));
                 } else if (Pattern.matches("^Unit.*", marker.getTitle())){
                     intent = new Intent(MapsActivity.this, StreetViewActivity.class);
                     intent.putExtra("title", marker.getTitle());
@@ -599,6 +599,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         mPriceMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.redstar));
                                     Marker marker = mMap.addMarker(mPriceMarkerOptions);
                                     marker.hideInfoWindow();
+                                    marker.setTag(lifetime);
                                     builder.include(latLngPrice);
                                     mHashMapCams.put(marker.getId(), marker);
                                     marker.setTitle("Camera #" + post_id);

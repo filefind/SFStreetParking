@@ -105,7 +105,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TimerTask mTt1;
     private Boolean dtaskMetersDone = false;
     private Boolean dtaskCamsDone = false;
-    public String lifetime = "https://filefind.info";
+    public String lifetime = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,10 +220,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     intent.putExtra("link", lifetime);
                 } else if (Pattern.matches("^Unit.*", marker.getTitle())){
                     intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                    intent.putExtra("title", marker.getTitle());
+                    intent.putExtra("lat", marker.getPosition().latitude);
+                    intent.putExtra("lon", marker.getPosition().longitude);
                 }
-                intent.putExtra("title", marker.getTitle());
-                intent.putExtra("lat", marker.getPosition().latitude);
-                intent.putExtra("lon", marker.getPosition().longitude);
 //                startActivity(intent);
 //                Toast.makeText(MapsActivity.this, "Dynamic Street View feature will incur charges",
 //                        Toast.LENGTH_LONG).show();
@@ -553,12 +553,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                            Log.e("+------", String.valueOf(jsonArray));
                             if (jsonArray.length() > 0) {
                                 Boolean showMin = false;
-                                String snippetValue = "";
                                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                                 mHashMapCams.clear();
-                                String post_id,status,title,user;
+                                String post_id,status,title,user,snippetValueCam;
                                 Double latitude,longitude;
                                 for (int j = 0; j < jsonArray.length(); j++) {
+                                    snippetValueCam = "";
                                     JSONObject jsonObjectUnit = (JSONObject) jsonArray.get(j);
                                     if (!jsonObjectUnit.has("id")) {
                                         continue;
@@ -603,19 +603,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     mHashMapCams.put(marker.getId(), marker);
                                     marker.setTitle("Camera #" + post_id);
 
-                                    snippetValue += "Status: " + status +
+                                    snippetValueCam += "Status: " + status +
                                             "\n";
-                                    snippetValue += title +
+                                    snippetValueCam += "Title: " + title +
                                             "\n";
-                                    snippetValue += user +
+                                    snippetValueCam += "User: " + user +
                                             "\n";
-                                    snippetValue += title +
-                                            "\n";
-//                                    snippetValue += "<a href=\"" + lifetime + "\">life</>" +
+//                                    snippetValue += title +
+//                                            "\n";
+//                                    snippetValue += lifetime
 //                                            "\n";
 
-                                    Log.e("______", snippetValue);
-                                    marker.setSnippet(snippetValue);
+//                                    Log.e("______", snippetValueCam);
+                                    marker.setSnippet(snippetValueCam);
                                 }
                                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),
                                         100));

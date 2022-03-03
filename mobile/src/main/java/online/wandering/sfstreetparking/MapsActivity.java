@@ -56,6 +56,9 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Pattern;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient
@@ -69,6 +72,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationManager mLocationManager;
     private String mLocationProvider;
     private HashMap<String, Marker> mHashMap = new HashMap<String, Marker>();
+    private HashMap<String, Marker> mHashMapCams = new HashMap<String, Marker>();
     private LocationListener mLocationListener;
     private LocationCallback mLocationCallback;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -96,6 +100,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     double lat;
     double lon;
+
+    private Timer mTimer1;
+    private TimerTask mTt1;
+    private Boolean dtaskMetersDone = false;
+    private Boolean dtaskCamsDone = false;
+    public String lifetime = "https://filefind.info";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,7 +214,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //                    startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
 //                    return;
 //                }
-                Intent intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                Intent intent = new Intent();
+                if(Pattern.matches("^Camera.*", marker.getTitle())){
+                    intent = new Intent(MapsActivity.this, LoadWebActivity.class);
+                    intent.putExtra("link", lifetime);
+                } else if (Pattern.matches("^Unit.*", marker.getTitle())){
+                    intent = new Intent(MapsActivity.this, StreetViewActivity.class);
+                }
                 intent.putExtra("title", marker.getTitle());
                 intent.putExtra("lat", marker.getPosition().latitude);
                 intent.putExtra("lon", marker.getPosition().longitude);
@@ -263,7 +279,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         new Thread(camTread).start();
 
     }
-
+    public void helpLoad() {
+//        Intent intent = new Intent(MapsActivity.this,
+//                LoadWebActivity.class);
+//        intent.putExtra("link", MainActivity.URL_connect+"?loadHelp=map");
+//        startActivity(intent);
+    }
     protected synchronized void buildGoogleApiClient() {
 //        Log.e("mGoogleApiClient", "buildGoogleApiClient");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -353,6 +374,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        checkParking(location.getLatitude(),location.getLongitude());
     }
 
+    private void stopTimer(){
+        if(mTimer1 != null){
+            mTimer1.cancel();
+            mTimer1.purge();
+        }
+    }
+
+    private void startTimer(){
+        mTimer1 = new Timer();
+        mTt1 = new TimerTask() {
+            public void run() {
+                Log.e("--- Run ---","Ticker");
+                dtaskMetersDone = true;
+            }
+        };
+
+        mTimer1.schedule(mTt1, 1, 5000);
+    }
     private void checkParking (double lat, double lng){
         Map<String, String> assoc = new HashMap<String, String>();
         assoc.put("lat", String.valueOf(lat));
@@ -499,8 +538,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Map.Entry<String, String> e : assoc.entrySet()) {
             userdata += e.getKey() + "=" + e.getValue() + "&";
         }
-        Log.e("--------",userdata);
-         new DownloadTask() {
+//        Log.e("--------",userdata);
+        new DownloadTask() {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
@@ -516,28 +555,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 Boolean showMin = false;
                                 String snippetValue = "";
                                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                                mHashMapCams.clear();
+                                String post_id,status,title,user;
+                                Double latitude,longitude;
                                 for (int j = 0; j < jsonArray.length(); j++) {
                                     JSONObject jsonObjectUnit = (JSONObject) jsonArray.get(j);
-                                    Log.e("******", String.valueOf(jsonObjectUnit.getInt("id")));
-                                    if (!jsonObjectUnit.has("id")){
+                                    if (!jsonObjectUnit.has("id")) {
                                         continue;
                                     }
-                                    String post_id = jsonObjectUnit.getString
+                                    if (!jsonObjectUnit.has("status") || !jsonObjectUnit.getString
+                                            ("status").equals("active")) {
+                                        continue;
+                                    }
+                                    if (!jsonObjectUnit.has("title") || jsonObjectUnit.getString
+                                            ("title").equals("")) {
+                                        continue;
+                                    }
+                                    post_id = jsonObjectUnit.getString
                                             ("id");
-                                    String status = jsonObjectUnit.getString
+                                    status = jsonObjectUnit.getString
                                             ("status");
-                                    String title = jsonObjectUnit.getString
+                                    title = jsonObjectUnit.getString
                                             ("title");
-                                    Double latitude =
+                                    latitude =
+                                            Double.valueOf(jsonObjectUnit.getJSONObject("location").getString("latitude"));
+                                    longitude =
                                             Double.valueOf(jsonObjectUnit.getJSONObject("location").getString
-                                            ("latitude"));
-                                    Double longitude = Double.valueOf(jsonObjectUnit.getJSONObject("location").getString
                                             ("longitude"));
-                                    String lifetime = jsonObjectUnit.getJSONObject(
+                                    lifetime = jsonObjectUnit.getJSONObject(
                                             "player").getJSONObject(
                                             "lifetime").getString
-                                            ("embeded");
-                                    String user = jsonObjectUnit.getJSONObject(
+                                            ("embed");
+                                    Log.e("******",
+                                            String.valueOf(lifetime));
+                                    user = jsonObjectUnit.getJSONObject(
                                             "user").getString
                                             ("name");
                                     MarkerOptions mPriceMarkerOptions = new MarkerOptions();
@@ -549,21 +600,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     Marker marker = mMap.addMarker(mPriceMarkerOptions);
                                     marker.hideInfoWindow();
                                     builder.include(latLngPrice);
-                                    mHashMap.put(marker.getId(), marker);
+                                    mHashMapCams.put(marker.getId(), marker);
                                     marker.setTitle("Camera #" + post_id);
 
                                     snippetValue += "Status: " + status +
                                             "\n";
                                     snippetValue += title +
                                             "\n";
-                                    snippetValue += "<a href=\""+lifetime+"\">life</>" +
+                                    snippetValue += user +
                                             "\n";
+                                    snippetValue += title +
+                                            "\n";
+//                                    snippetValue += "<a href=\"" + lifetime + "\">life</>" +
+//                                            "\n";
 
+                                    Log.e("______", snippetValue);
                                     marker.setSnippet(snippetValue);
-                                    if (showMin.equals(true)) {
-                                        marker.showInfoWindow();
-                                    }
                                 }
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),
+                                        100));
                             }
                         }
                     } catch (JSONException e) {
@@ -573,7 +628,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
             }
-        }.execute("https://meters.filefind.info/proxy.php?action=loadCams",userdata);
+        }.execute("https://meters.filefind.info/proxy.php?action=loadCams", userdata);
     }
 
     public void loadAvailability (String post_id){

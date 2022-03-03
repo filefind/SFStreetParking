@@ -4,6 +4,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'SFONStreetParking'
+            keyPassword 'practic12'
+            storeFile file('/home/user/AndroidStudioProjects/SFStreetParking/keystore.jks')
+            storePassword 'practic12'
         }
     }
     compileSdkVersion 32

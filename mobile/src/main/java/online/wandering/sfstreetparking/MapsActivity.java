@@ -590,7 +590,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                             ("longitude"));
                                     lifetime = jsonObjectUnit.getJSONObject(
                                             "player").getJSONObject(
-                                            "lifetime").getString
+                                            "day").getString
                                             ("embed");
                                     Log.e("******",
                                             String.valueOf(lifetime));
